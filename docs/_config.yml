@@ -1,0 +1,4 @@
+name: Dryad
+markdown: redcarpet
+highlighter: pygments
+baseurl: /

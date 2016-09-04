@@ -1,0 +1,12 @@
+---
+layout: default
+title: Blog
+---
+
+<ul id="blog-list">
+{% for post in site.posts %}
+  {% if post.categories contains 'blog' %}
+    {% include post_summary.html post=post %}
+  {% endif %}
+{% endfor %}
+</ul>
