@@ -34,6 +34,7 @@ class ErrorHandler {
 
 const ERRORS = {
   UNDEFINED: 'The script tried to call a function that hasn\'t been defined yet!',
+  SELF_IMPORT: 'Script cannot import itself',
 };
 
 module.exports = {

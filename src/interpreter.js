@@ -1,68 +1,17 @@
 const TYPES = require('./types');
-const Env = require('./env');
 const {ERRORS} = require('./error');
+const special = require('./special');
 
 class Interpreter {
-  constructor(errorHandler) {
+  constructor(errorHandler, filePath) {
     this.errorHandler = errorHandler;
-
-    this.special = {
-      set: (x, env) => {
-        const [_, name, exp] = x;
-        return env.set(name.value, this.interpret(exp, env));
-      },
-
-      // (call name args)
-
-      // fn could actually be implemented
-      // as a macro with form:
-      // (set name (lambda (args) (body)))
-      // where lambda is implemented as
-      // below without set + name
-      fn: (x, env) => {
-        const [_, name, params, body] = x;
-
-        const fn = (...args) => {
-          const scope = params.reduce((acc, x, i) => {
-            acc[x.value] = args[i];
-            return acc;
-          }, {});
-
-          return this.interpret(body, new Env(scope, env));
-        }
-
-        return env.set(name.value, fn);
-      },
-
-      if: (x, env) => {
-        this.interpret(x[1], env) ?
-          this.interpret(x[2], env) :
-          x[3] && this.interpret(x[3], env);
-
-        return null;
-      },
-
-      '>': (x, env) => {
-        return this.interpret(x[1], env) > this.interpret(x[2], env);
-      },
-      '<': (x, env) => {
-        return this.interpret(x[1], env) < this.interpret(x[2], env);
-      },
-      '>=': (x, env) => {
-        return this.interpret(x[1], env) >= this.interpret(x[2], env);
-      },
-      '<=': (x, env) => {
-        return this.interpret(x[1], env) <= this.interpret(x[2], env);
-      },
-      '=': (x, env) => {
-        return this.interpret(x[1], env) === this.interpret(x[2], env);
-      },
-    };
+    this.filePath = filePath;
   }
 
   interpretList(x, env) {
-    if (x.length > 0 && x[0].value in this.special) {
-      return this.special[x[0].value](x, env);
+    if (x.length > 0 && x[0].value in special) {
+      const func = special[x[0].value];
+      return func.bind(this)(x, env);
     }
 
     const list = x.map(item => this.interpret(item, env));

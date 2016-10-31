@@ -1,15 +1,4 @@
 #!/usr/bin/env node
-
-var {standardEnv} = require('../src/util');
-const {parse} = require('../src/parser');
-const {getScript} = require('../src/file');
-const {Interpreter} = require('../src/interpreter');
-const {ErrorHandler} = require('../src/error');
-
-const globalEnv = standardEnv();
-const program = getScript();
-
-const tree = parse(program);
-const errorHandler = new ErrorHandler();
-const interpreter = new Interpreter(errorHandler);
-interpreter.interpret(tree, globalEnv);
+const {CLI} = require('../src/cli');
+const cli = new CLI();
+cli.run();
