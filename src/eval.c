@@ -4,10 +4,10 @@ val* val_call(env* e, val* f, val* a) {
   if (f->builtin) {
     return f->builtin(e, a);
   }
-  
+
   int given = a->count;
   int total = f->formals->count;
-  
+
   while (a->count) {
     if (f->formals->count == 0) {
       val_del(a);
@@ -17,11 +17,11 @@ val* val_call(env* e, val* f, val* a) {
         "Got %i, Expected %i.",
         given,
         total
-      ); 
+      );
     }
-    
+
     val* sym = val_pop(f->formals, 0);
-    
+
     if (strcmp(sym->sym, "&") == 0) {
       if (f->formals->count != 1) {
         val_del(a);
@@ -31,26 +31,25 @@ val* val_call(env* e, val* f, val* a) {
           "Symbol '&' not followed by single symbol."
         );
       }
-      
+
       val* nsym = val_pop(f->formals, 0);
       env_put(f->env, nsym, builtin_list(e, a));
       val_del(sym);
       val_del(nsym);
       break;
     }
-    
-    val* val = val_pop(a, 0);    
-    env_put(f->env, sym, val);    
+
+    val* val = val_pop(a, 0);
+    env_put(f->env, sym, val);
     val_del(sym); val_del(val);
   }
-  
+
   val_del(a);
-  
+
   if (
     f->formals->count > 0 &&
     strcmp(f->formals->cell[0]->sym, "&") == 0
   ) {
-    
     if (f->formals->count != 2) {
       return val_err(
         f->state,
@@ -58,18 +57,18 @@ val* val_call(env* e, val* f, val* a) {
         "Symbol '&' not followed by single symbol."
       );
     }
-    
+
     val_del(val_pop(f->formals, 0));
-    
+
     val* sym = val_pop(f->formals, 0);
     val* val = val_qexpr(f->state);
     env_put(f->env, sym, val);
     val_del(sym);
     val_del(val);
   }
-  
-  if (f->formals->count == 0) {  
-    f->env->par = e;    
+
+  if (f->formals->count == 0) {
+    f->env->par = e;
 
     return builtin_eval(
       f->env,
@@ -99,8 +98,9 @@ val* val_eval_sexpr(env* e, val* v) {
   if (v->count == 1) {
     return val_eval(e, val_take(v, 0));
   }
-  
+
   val* f = val_pop(v, 0);
+
   if (f->type != VAL_FUN) {
     val* err = val_err(
       f->state,
@@ -113,7 +113,7 @@ val* val_eval_sexpr(env* e, val* v) {
     val_del(v);
     return err;
   }
-  
+
   val* result = val_call(e, f, v);
   val_del(f);
   return result;

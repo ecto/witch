@@ -7,8 +7,6 @@ typedef struct val val;
 typedef struct val_state val_state;
 
 #include "env.h"
-
-//typedef val*(*builtin)(env*, val*);
 #include "mpc.h"
 #include "builtin.h"
 
@@ -26,13 +24,13 @@ struct val {
   char* err;
   char* sym;
   char* str;
-  
+
   // function
   builtin* builtin;
   env* env;
   val* formals;
   val* body;
-  
+
   // expression
   int count;
   val** cell;
@@ -42,7 +40,7 @@ enum {
   VAL_ERR,
   VAL_NUM,
   VAL_SYM,
-  VAL_STR, 
+  VAL_STR,
   VAL_FUN,
   VAL_SEXPR,
   VAL_QEXPR

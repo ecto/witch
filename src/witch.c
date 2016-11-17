@@ -29,7 +29,6 @@ int main(int argc, char** argv) {
 
   if (argc >= 2) {
     for (int i = 1; i < argc; i++) {
-      // TODO better state creation
       val_state* state = val_state_create("main", val_state_location(0, 0, 0));
       val* args = val_add(val_sexpr(state), val_str(state, argv[i]));
       val* x = builtin_load(e, args);
