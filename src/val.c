@@ -209,18 +209,18 @@ void val_print(val* v) {
       if (v->builtin) {
         printf("<builtin>");
       } else {
-        printf("(fn ");
+        printf("[fn ");
         val_print(v->formals);
         putchar(' ');
         val_print(v->body);
-        putchar(')');
+        putchar(']');
       }
     break;
     case VAL_NUM:   printf("%li", v->num); break;
     case VAL_ERR:   val_print_err(v); break;
     case VAL_SYM:   printf("%s", v->sym); break;
     case VAL_STR:   val_print_str(v); break;
-    case VAL_SEXPR: val_print_expr(v, '(', ')'); break;
+    case VAL_SEXPR: val_print_expr(v, '[', ']'); break;
     case VAL_QEXPR: val_print_expr(v, '{', '}'); break;
   }
 }

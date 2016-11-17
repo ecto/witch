@@ -43,10 +43,10 @@ val* val_read(mpc_ast_t* t, char* filename) {
   if (strstr(t->tag, "qexpr"))  { x = val_qexpr(state); }
   
   for (int i = 0; i < t->children_num; i++) {
-    if (strcmp(t->children[i]->contents, "(") == 0) { continue; }
-    if (strcmp(t->children[i]->contents, ")") == 0) { continue; }
-    if (strcmp(t->children[i]->contents, "}") == 0) { continue; }
+    if (strcmp(t->children[i]->contents, "[") == 0) { continue; }
+    if (strcmp(t->children[i]->contents, "]") == 0) { continue; }
     if (strcmp(t->children[i]->contents, "{") == 0) { continue; }
+    if (strcmp(t->children[i]->contents, "}") == 0) { continue; }
     if (strcmp(t->children[i]->tag,  "regex") == 0) { continue; }
     if (strstr(t->children[i]->tag, "comment")) { continue; }
     x = val_add(x, val_read(t->children[i], filename));
