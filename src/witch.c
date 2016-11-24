@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <editline/readline.h>
+//#include <editline/readline.h>
 
 #include "val.h"
 #include "builtin.h"
@@ -15,6 +15,8 @@ int main(int argc, char** argv) {
   env* e = env_new();
   env_add_builtins(e);
 
+/*
+  // emscripten doesn't like editline
   if (argc == 1) {
     puts("Witch Version 0.0.0.1.0");
     puts("Press Ctrl+c to Exit\n");
@@ -26,6 +28,7 @@ int main(int argc, char** argv) {
       free(input);
     }
   }
+*/
 
   if (argc >= 2) {
     for (int i = 1; i < argc; i++) {
