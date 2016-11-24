@@ -318,12 +318,12 @@ void env_add_builtins(env* e) {
 
   // comparisons
   env_add_builtin(e, "if", builtin_if);
-  env_add_builtin(e, "==", builtin_eq);
-  env_add_builtin(e, "!=", builtin_ne);
-  env_add_builtin(e, ">",  builtin_gt);
-  env_add_builtin(e, "<",  builtin_lt);
-  env_add_builtin(e, ">=", builtin_ge);
-  env_add_builtin(e, "<=", builtin_le);
+  env_add_builtin(e, "=?", builtin_eq);
+  env_add_builtin(e, "!=?", builtin_ne);
+  env_add_builtin(e, ">?",  builtin_gt);
+  env_add_builtin(e, "<?",  builtin_lt);
+  env_add_builtin(e, ">=?", builtin_ge);
+  env_add_builtin(e, "<=?", builtin_le);
 
   // strings
   env_add_builtin(e, "load",  builtin_load);
