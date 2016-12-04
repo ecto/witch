@@ -2,7 +2,7 @@
 
 val* val_read_num(val_state* state, mpc_ast_t* t) {
   errno = 0;
-  long x = strtol(t->contents, NULL, 10);
+  double x = atof(t->contents);
   return errno != ERANGE ?
     val_num(state, x) :
     val_err(state, "Invalid Number.");

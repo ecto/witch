@@ -20,7 +20,7 @@ struct val {
   val_state* state;
 
   // basic
-  long num;
+  double num;
   char* err;
   char* sym;
   char* str;
@@ -46,7 +46,7 @@ enum {
   VAL_QEXPR
 };
 
-val* val_num(val_state* state, long x);
+val* val_num(val_state* state, double x);
 val* val_err(val_state* state, char* fmt, ...);
 val* val_sym(val_state* state, char* s);
 val* val_str(val_state* state, char* s);

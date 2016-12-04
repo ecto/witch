@@ -10,11 +10,13 @@ void parser_init() {
   Expr = mpc_new("expr");
   Program = mpc_new("program");
 
+      //number  : /-?[0-9]+/ ;
+
   mpca_lang(
     MPCA_LANG_DEFAULT,
     "                                              \
-      number  : /-?[0-9]+/ ;                       \
-      symbol  : /[a-zA-Z0-9_+\\-*\\/\\\\=<>!&?]+/ ; \
+      number  : /[+-]?([0-9]*[.])?[0-9]+/ ;        \
+      symbol  : /[a-zA-Z0-9_+\\-*\\/\\\\=<>!&?]+/ ;\
       string  : /\"(\\\\.|[^\"])*\"/ ;             \
       comment : /# [^\\r\\n]*/ ;                   \
       sexpr   : '[' <expr>* ']' ;                  \

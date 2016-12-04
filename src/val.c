@@ -1,6 +1,6 @@
 #import "val.h"
 
-val* val_num(val_state* state, long x) {
+val* val_num(val_state* state, double x) {
   val* v = malloc(sizeof(val));
   v->type = VAL_NUM;
   v->state = state;
@@ -232,7 +232,7 @@ void val_print(val* v) {
       }
       break;
     case VAL_NUM:
-      printf("%li", v->num);
+      printf("%.5lf!", v->num);
       break;
     case VAL_ERR:
       val_print_err(v);
