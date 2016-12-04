@@ -298,10 +298,10 @@ void env_add_builtin(env* e, char* name, builtin func) {
 
 void env_add_builtins(env* e) {
   // variables
-  env_add_builtin(e, "fn",  builtin_lambda);
+  env_add_builtin(e, "fn", builtin_lambda);
 // not sure if i want to allow globals
 //  env_add_builtin(e, "def", builtin_def);
-  env_add_builtin(e, "=",   builtin_put);
+  env_add_builtin(e, "=", builtin_put);
 
   // lists
   env_add_builtin(e, "list", builtin_list);
@@ -320,13 +320,13 @@ void env_add_builtins(env* e) {
   env_add_builtin(e, "if", builtin_if);
   env_add_builtin(e, "=?", builtin_eq);
   env_add_builtin(e, "!=?", builtin_ne);
-  env_add_builtin(e, ">?",  builtin_gt);
-  env_add_builtin(e, "<?",  builtin_lt);
+  env_add_builtin(e, ">?", builtin_gt);
+  env_add_builtin(e, "<?", builtin_lt);
   env_add_builtin(e, ">=?", builtin_ge);
   env_add_builtin(e, "<=?", builtin_le);
 
   // strings
-  env_add_builtin(e, "load",  builtin_load);
+  env_add_builtin(e, "load", builtin_load);
   env_add_builtin(e, "error", builtin_error);
   env_add_builtin(e, "print", builtin_print);
 }

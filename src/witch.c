@@ -8,6 +8,9 @@
 #include "eval.h"
 #include "parse.h"
 #include "read.h"
+#include "stdlib.h"
+
+#define FSTDLIB "<stdlib>"
 
 int main(int argc, char** argv) {
   parser_init();
@@ -30,23 +33,31 @@ int main(int argc, char** argv) {
   }
 */
 
-  if (argc >= 2) {
-    for (int i = 1; i < argc; i++) {
-      val_state* state = val_state_create("main", val_state_location(0, 0, 0));
-      val* args = val_add(val_sexpr(state), val_str(state, argv[i]));
-      val* x = builtin_load(e, args);
+  if (argc < 2) {
+    env_del(e);
+    parser_cleanup();
+    return 1;
+  }
 
-      if (x->type == VAL_ERR) {
-        val_println(x);
-        return 1;
-      }
+  val_state* state = val_state_create("main", val_state_location(0, 0, 0));
 
-      val_del(x);
+  // xxd does not null-terminate
+  stdlib[stdlib_len] = '\0';
+  parser_run_with_location((char*)stdlib, e, FSTDLIB);
+
+  for (int i = 1; i < argc; i++) {
+    val* args = val_add(val_sexpr(state), val_str(state, argv[i]));
+    val* x = builtin_load(e, args);
+
+    if (x->type == VAL_ERR) {
+      val_println(x);
+      return 1;
     }
+
+    val_del(x);
   }
 
   env_del(e);
-
   parser_cleanup();
 
   return 0;

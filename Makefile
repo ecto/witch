@@ -1,4 +1,6 @@
-all:
+.PHONY: all std wasm
+
+all: std
 	@cc -std=c99 -Wall \
     src/builtin.c \
     src/env.c \
@@ -11,6 +13,21 @@ all:
     -ledit \
 		-lm \
 		-o witch \
+
+std:
+	@cat \
+		lib/atom.w \
+		lib/func.w \
+		lib/logic.w \
+		lib/misc.w \
+		lib/list.w \
+		lib/cond.w \
+		> stdlib \
+		&& xxd -i \
+		stdlib src/stdlib.h \
+		&& cat -n stdlib \
+		&& rm stdlib
+
 
 wasm:
 	LLVM=/Users/ecto/code/emscripten-fastcomp/build/bin \

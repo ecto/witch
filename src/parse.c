@@ -14,7 +14,7 @@ void parser_init() {
     MPCA_LANG_DEFAULT,
     "                                              \
       number  : /-?[0-9]+/ ;                       \
-      symbol  : /[a-zA-Z0-9_+\\-*\\/\\\\=<>!&]+/ ; \
+      symbol  : /[a-zA-Z0-9_+\\-*\\/\\\\=<>!&?]+/ ; \
       string  : /\"(\\\\.|[^\"])*\"/ ;             \
       comment : /# [^\\r\\n]*/ ;                   \
       sexpr   : '[' <expr>* ']' ;                  \
@@ -34,18 +34,33 @@ void parser_init() {
   );
 }
 
-void parser_run(char* input, env* e) {
+void parser_run_with_location(char* input, env* e, char* location) {
   mpc_result_t r;
 
-  if (mpc_parse("<stdin>", input, Program, &r)) {
-    val* x = val_eval(e, val_read(r.output, "repl"));
-    val_println(x);
-    val_del(x);
-    mpc_ast_delete(r.output);
-  } else {
+  if (!mpc_parse(location, input, Program, &r)) {
     mpc_err_print(r.error);
     mpc_err_delete(r.error);
+    return;
   }
+
+  val* expr = val_read(r.output, location);
+  mpc_ast_delete(r.output);
+
+  while (expr->count) {
+    val* x = val_eval(e, val_pop(expr, 0));
+
+    if (x->type == VAL_ERR) {
+      val_println(x);
+    }
+
+    val_del(x);
+  }
+
+  val_del(expr);
+}
+
+void parser_run(char* input, env* e) {
+  parser_run_with_location(input, e, "<stdin>");
 }
 
 val* parser_load_file(val* a, env* e) {
@@ -68,6 +83,7 @@ val* parser_load_file(val* a, env* e) {
 
     if (x->type == VAL_ERR) {
       val_println(x);
+      break;
     }
 
     val_del(x);
