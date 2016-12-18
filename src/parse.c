@@ -20,7 +20,7 @@ void parser_init() {
       string  : /\"(\\\\.|[^\"])*\"/ ;             \
       comment : /# [^\\r\\n]*/ ;                   \
       sexpr   : '[' <expr>* ']' ;                  \
-      qexpr   : '{' <expr>* '}' ;                  \
+      qexpr   : ':' <expr>* ;                  \
       expr    : <number>  | <symbol> | <string>    \
               | <comment> | <sexpr>  | <qexpr>;    \
       program : /^/ <expr>* /$/ ;                  \

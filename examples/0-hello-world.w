@@ -1,7 +1,7 @@
-[= {hello-world} "2: hello, world"]
-[= {print-hello}
-  [fn {name}
-    {print "3:" "hello," name}
+[= :hello-world "2: hello, world"]
+[= :print-hello
+  [fn :name
+    :[print "3:" "hello," name]
   ]
 ]
 
