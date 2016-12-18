@@ -1,1 +1,0 @@
-(log bar 'zerp')
