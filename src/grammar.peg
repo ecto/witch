@@ -25,40 +25,60 @@ Statement
         type: 'statement',
         value,
         children,
-      };
+        };
+      }
+
+  Identifier "identifier"
+    = start:[a-zA-Z_$] meat:[a-zA-Z_$0-9]* Space? {
+      const name = start + meat.join('');
+      return make('identifier', name);
     }
 
-Identifier "identifier"
-  = name:[a-zA-Z0-9=-]+ Space? {
-    return make('identifier', name.join(''));
+  SourceCharacter
+    = .
+
+  DoubleNewline "double newline"
+    = Newline Newline
+
+  Newline "newline"
+    = [\n\r\u2028\u2029]
+
+  Space "single space"
+    = " "
+
+  Literal
+    = StringLiteral
+    / NumberLiteral
+
+  SingleQuote
+    = "'"
+
+  StringLiteral "string"
+    = SingleQuote chars:SingleStringCharacter* SingleQuote Space? {
+      return make('string', chars.join(''));
+    }
+
+  SingleStringCharacter
+    = !SingleQuote char:SourceCharacter {
+      return char[0];
+    }
+
+NumberLiteral "number"
+  = IntLiteral
+  / FloatLiteral
+
+IntLiteral
+  = chars:[0-9]+ Space? {
+    const int = parseInt(chars.join(''));
+    return make('number', int);
   }
 
-SourceCharacter
-  = .
-
-DoubleNewline "double newline"
-  = Newline Newline
-
-Newline "newline"
-  = [\n\r\u2028\u2029]
-
-Space "single space"
-  = " "
-
-Literal
-  = StringLiteral
-
-SingleQuote
-  = "'"
-
-StringLiteral "string"
-  = SingleQuote chars:SingleStringCharacter* SingleQuote Space? {
-    return make('string', chars.join(''));
-  }
-
-SingleStringCharacter
-  = !SingleQuote char:SourceCharacter {
-    return char[0];
+FloatLiteral
+  = left:[0-9]* "." right:[0-9]+ Space? {
+    const float = parseFloat(
+      left.join('') + '.' + right.join('')
+    );
+    return make('number', float)
   }
 
 EOF

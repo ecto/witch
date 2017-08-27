@@ -3,6 +3,7 @@ const llvm = require('llvm-node');
 const MODULE_NAME = 'top';
 const TYPE_FUNCTION = 'fn';
 const TYPE_STRING = 'string';
+const TYPE_NUMBER = 'number';
 const TYPE_IDENTIFIER = 'identifier';
 const TYPE_ARGUMENT = 'argument';
 const TYPE_CALL = 'call';
@@ -65,11 +66,16 @@ module.exports = class Generator {
         args.push(stringRef);
       }
 
+      if (arg.type === TYPE_NUMBER) {
+        const numRef = this.writeNumberAllocation(arg);
+        args.push(numRef);
+      }
+
       if (arg.type === TYPE_IDENTIFIER) {
         if (!env[arg.value]) {
           console.log(Object.keys(env));
           throw new Error(
-            'calling function with unknown indentifier' + arg.value
+            'calling function with unknown indentifier ' + arg.value
           );
         }
 
@@ -91,6 +97,17 @@ module.exports = class Generator {
     const arrType = llvm.ArrayType.get(int8Type, arg.value.length + 1); // +1 for null terminator
     const alloca = this.builder.createAlloca(arrType, arg.name);
     const val = llvm.ConstantDataArray.getString(this.context, arg.value);
+    const store = this.builder.createStore(val, alloca);
+    const bitcast = this.builder.createBitCast(alloca, int8Type.getPointerTo());
+    return bitcast;
+  }
+
+  writeNumberAllocation(arg) {
+    const int8Type = llvm.Type.getInt8Ty(this.context);
+    const doubleType = llvm.Type.getDoubleTy(this.context);
+    const alloca = this.builder.createAlloca(doubleType, arg.name);
+    const val = llvm.ConstantFP.get(this.context, arg.value);
+    console.log('STORE', arg.value);
     const store = this.builder.createStore(val, alloca);
     const bitcast = this.builder.createBitCast(alloca, int8Type.getPointerTo());
     return bitcast;

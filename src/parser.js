@@ -31,13 +31,18 @@ module.exports = class Parser {
       const push = new Array(depth * 2 + 1).join(' ');
 
       if (type === TYPE_DEFINITION) {
-        console.log(push, 'DEFINE', name, args.map(arg => arg.value));
+        console.log(
+          push,
+          'DEFINE',
+          name,
+          args.map(arg => [arg.value, arg.type])
+        );
         this.print(children, depth + 1);
         return;
       }
 
       if (type === TYPE_CALL) {
-        console.log(push, 'CALL', name, args.map(arg => arg.value));
+        console.log(push, 'CALL', name, args.map(arg => [arg.value, arg.type]));
         return;
       }
 
