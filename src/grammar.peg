@@ -1,0 +1,82 @@
+{
+  let lastLineIndentLevel = 0;
+  let currentIndentLevel = 0;
+
+  function make(type, value) {
+    return {
+      type,
+      value,
+    };
+  }
+}
+
+Start
+  = (Statement / Newline)*
+
+Statement
+  = Samedent
+    value:(Identifier / Literal)+
+    Newline*
+    Indent
+    children:Statement*
+    Outdent
+    Newline? {
+      return {
+        type: 'statement',
+        value,
+        children,
+      };
+    }
+
+Identifier "identifier"
+  = name:[a-zA-Z0-9=-]+ Space? {
+    return make('identifier', name.join(''));
+  }
+
+SourceCharacter
+  = .
+
+DoubleNewline "double newline"
+  = Newline Newline
+
+Newline "newline"
+  = [\n\r\u2028\u2029]
+
+Space "single space"
+  = " "
+
+Literal
+  = StringLiteral
+
+SingleQuote
+  = "'"
+
+StringLiteral "string"
+  = SingleQuote chars:SingleStringCharacter* SingleQuote Space? {
+    return make('string', chars.join(''));
+  }
+
+SingleStringCharacter
+  = !SingleQuote char:SourceCharacter {
+    return char[0];
+  }
+
+EOF
+  = !.
+
+Samedent
+  = indents:(Space Space)* &{
+    return indents.length === currentIndentLevel;
+  }
+
+Indent "indent"
+  = &{
+    currentIndentLevel++;
+    return true;
+  }
+
+Outdent
+  = &{
+    currentIndentLevel--;
+    return true;
+  }
