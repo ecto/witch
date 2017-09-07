@@ -5,9 +5,16 @@ const TYPE_FUNCTION = 'fn';
 const TYPE_STRING = 'string';
 const TYPE_NUMBER = 'number';
 const TYPE_IDENTIFIER = 'identifier';
+const TYPE_SHAPE_IDENTIFIER = 'shapeIdentifier';
 const TYPE_ARGUMENT = 'argument';
-const TYPE_CALL = 'call';
-const TYPE_DEFINITION = 'definition';
+const TYPE_SHAPE = 'shape';
+const TYPE_ATTRIBUTE = 'attribute';
+const TYPE_VARIABLE = 'variable';
+const STATEMENT_CALL = 'call';
+const STATEMENT_FUNCTION_DEFINITION = 'functionDefinition';
+const STATEMENT_SHAPE_DEFINITION = 'shapeDefinition';
+const STATEMENT_ATTRIBUTE_DEFINITION = 'attributeDefinition';
+const STATEMENT_CREATOR = 'creator';
 
 module.exports = class Generator {
   constructor() {
@@ -30,19 +37,45 @@ module.exports = class Generator {
       ref: putsFunc,
     };
 
+    env['Pointer'] = {
+      type: TYPE_SHAPE,
+      ref: int8Type.getPointerTo(),
+    };
+
     return env;
   }
 
   run(statements, env = this.createEnv()) {
     statements.forEach(statement => {
       const {type} = statement;
-      if (type === TYPE_CALL) {
+
+      if (type === STATEMENT_CALL) {
         this.writeCall(statement, env);
-      } else if (type === TYPE_DEFINITION) {
-        this.writeDefinition(statement, env);
-      } else {
-        console.log('?????', statement);
+        return;
       }
+
+      if (type === STATEMENT_FUNCTION_DEFINITION) {
+        this.writeFunctionDefinition(statement, env);
+        return;
+      }
+
+      if (type === STATEMENT_SHAPE_DEFINITION) {
+        this.writeShapeDefinition(statement, env);
+        return;
+      }
+
+      if (type === STATEMENT_ATTRIBUTE_DEFINITION) {
+        this.writeAttributeDefinition(statement, env);
+        return;
+      }
+
+      if (type === STATEMENT_CREATOR) {
+        this.writeCreation(statement, env);
+        return;
+      }
+
+      console.log(statement);
+      throw new Error('Unknown statement type: ' + type);
     });
   }
 
@@ -51,6 +84,7 @@ module.exports = class Generator {
   }
 
   writeCall(statement, env) {
+    console.log('WRITE CALL', statement);
     // for every argument
     // if it's a string, allocate it
     // if it's an identifer, make sure it exists
@@ -72,6 +106,7 @@ module.exports = class Generator {
       }
 
       if (arg.type === TYPE_IDENTIFIER) {
+        // || arg.type === TYPE_SHAPE_IDENTIFIER) {
         if (!env[arg.value]) {
           console.log(Object.keys(env));
           throw new Error(
@@ -81,6 +116,7 @@ module.exports = class Generator {
 
         const int8Type = llvm.Type.getInt8Ty(this.context);
         const ref = env[arg.value].ref;
+        console.log(ref);
         const bitcast = this.builder.createBitCast(
           ref,
           int8Type.getPointerTo()
@@ -107,13 +143,12 @@ module.exports = class Generator {
     const doubleType = llvm.Type.getDoubleTy(this.context);
     const alloca = this.builder.createAlloca(doubleType, arg.name);
     const val = llvm.ConstantFP.get(this.context, arg.value);
-    console.log('STORE', arg.value);
     const store = this.builder.createStore(val, alloca);
     const bitcast = this.builder.createBitCast(alloca, int8Type.getPointerTo());
     return bitcast;
   }
 
-  writeDefinition(statement, env) {
+  writeFunctionDefinition(statement, env) {
     const intType = llvm.Type.getInt64Ty(this.context);
     const int8Type = llvm.Type.getInt8Ty(this.context);
     const args = [];
@@ -152,6 +187,75 @@ module.exports = class Generator {
 
     const zero = llvm.ConstantInt.get(this.context, 0, 64);
     this.builder.createRet(zero);
+  }
+
+  writeShapeDefinition(statement, env) {
+    console.log('WRITE SHAPE DEFINITION', statement);
+
+    // for each in children
+    //    if type is attribute definition
+    //    add to attributes array
+    //    create struct
+    const attributes = [];
+    const functions = [];
+    statement.children.forEach(childStatement => {
+      if (childStatement.type === STATEMENT_ATTRIBUTE_DEFINITION) {
+        attributes.push(childStatement);
+      }
+      if (childStatement.type === STATEMENT_FUNCTION_DEFINITION) {
+        functions.push(childStatement);
+      }
+    });
+
+    const attributeTypes = attributes.map(attr => env[attr.shape].ref);
+    const struct = llvm.StructType.create(this.context, statement.name);
+    struct.setBody(attributeTypes);
+
+    env[statement.name] = {
+      type: TYPE_SHAPE,
+      ref: struct,
+      attributes,
+    };
+
+    // for each in children
+    //    if type is function
+    //      rewrite name
+    //      add to newChildren
+    //      this.run newChildren
+    //    add all to env
+    //      new() as env[name]
+    console.log('FUNCTIONS', functions);
+  }
+
+  writeAttributeDefinition(statement, env) {
+    console.log('WRITE ATTRIBUTE DEFINITION', statement);
+    env[statement.name] = {
+      type: TYPE_ATTRIBUTE,
+      name: statement.name,
+      shape: statement.shape,
+    };
+  }
+
+  writeCreation(statement, env) {
+    console.log('WRITE CREATION', statement);
+
+    if (!env[statement.shape]) {
+      console.log(Object.keys(env));
+      throw new Error('calling function with unknown indentifier ' + arg.value);
+    }
+
+    const type = env[statement.shape].ref;
+    console.log('0-------', type);
+
+    const zero = llvm.ConstantInt.get(this.context, 0, 64);
+    const alloca = this.builder.createAlloca(type, zero, statement.name);
+
+    env[statement.name] = {
+      type: TYPE_VARIABLE,
+      name: statement.name,
+      shape: statement.shape,
+      ref: alloca,
+    };
   }
 
   print() {

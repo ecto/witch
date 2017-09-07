@@ -11,16 +11,18 @@
 }
 
 Start
-  = (Statement / Newline)*
+  = Newline* statements:Statement* {
+    return statements;
+  }
 
 Statement
   = Samedent
-    value:(Identifier / Literal)+
+    value:Word+
     Newline*
     Indent
     children:Statement*
     Outdent
-    Newline? {
+    Newline* {
       return {
         type: 'statement',
         value,
@@ -28,40 +30,59 @@ Statement
         };
       }
 
-  Identifier "identifier"
-    = start:[a-zA-Z_$] meat:[a-zA-Z_$0-9]* Space? {
-      const name = start + meat.join('');
-      return make('identifier', name);
-    }
+Word
+  = SubIdentifier
+  / Identifier
+  / Literal
+  / ShapeName
 
-  SourceCharacter
-    = .
+Identifier "identifier"
+  = start:[a-z_$] meat:[a-zA-Z_$0-9]* Space? {
+    const name = start + meat.join('');
+    return make('identifier', name);
+  }
 
-  DoubleNewline "double newline"
-    = Newline Newline
+SubIdentifier
+  = identifiers:(Identifier "." Identifier) {
+    const ids = identifiers.filter(id => id.type === 'identifier').map(id => id.value);
+    return make('identifier', ids);
+  }
 
-  Newline "newline"
-    = [\n\r\u2028\u2029]
+ShapeName "shape identifier"
+  = start:[A-Z] meat:[a-zA-Z_$0-9]* Space? {
+    const name = start + meat.join('');
+    return make('shapeIdentifier', name);
+  }
 
-  Space "single space"
-    = " "
 
-  Literal
-    = StringLiteral
-    / NumberLiteral
+SourceCharacter
+  = .
 
-  SingleQuote
-    = "'"
+DoubleNewline "double newline"
+  = Newline Newline
 
-  StringLiteral "string"
-    = SingleQuote chars:SingleStringCharacter* SingleQuote Space? {
-      return make('string', chars.join(''));
-    }
+Newline "newline"
+  = [\n\r\u2028\u2029]
 
-  SingleStringCharacter
-    = !SingleQuote char:SourceCharacter {
-      return char[0];
-    }
+Space "single space"
+  = " "
+
+Literal
+  = StringLiteral
+  / NumberLiteral
+
+SingleQuote
+  = "'"
+
+StringLiteral "string"
+  = SingleQuote chars:SingleStringCharacter* SingleQuote Space? {
+    return make('string', chars.join(''));
+  }
+
+SingleStringCharacter
+  = !SingleQuote char:SourceCharacter {
+    return char[0];
+  }
 
 NumberLiteral "number"
   = IntLiteral
