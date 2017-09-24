@@ -84,7 +84,6 @@ module.exports = class Generator {
   }
 
   writeCall(statement, env) {
-    console.log('WRITE CALL', statement);
     // for every argument
     // if it's a string, allocate it
     // if it's an identifer, make sure it exists
@@ -116,7 +115,6 @@ module.exports = class Generator {
 
         const int8Type = llvm.Type.getInt8Ty(this.context);
         const ref = env[arg.value].ref;
-        console.log(ref);
         const bitcast = this.builder.createBitCast(
           ref,
           int8Type.getPointerTo()
@@ -190,8 +188,6 @@ module.exports = class Generator {
   }
 
   writeShapeDefinition(statement, env) {
-    console.log('WRITE SHAPE DEFINITION', statement);
-
     // for each in children
     //    if type is attribute definition
     //    add to attributes array
@@ -224,11 +220,10 @@ module.exports = class Generator {
     //      this.run newChildren
     //    add all to env
     //      new() as env[name]
-    console.log('FUNCTIONS', functions);
+    // console.log("FUNCTIONS", functions);
   }
 
   writeAttributeDefinition(statement, env) {
-    console.log('WRITE ATTRIBUTE DEFINITION', statement);
     env[statement.name] = {
       type: TYPE_ATTRIBUTE,
       name: statement.name,
@@ -237,16 +232,11 @@ module.exports = class Generator {
   }
 
   writeCreation(statement, env) {
-    console.log('WRITE CREATION', statement);
-
     if (!env[statement.shape]) {
-      console.log(Object.keys(env));
       throw new Error('calling function with unknown indentifier ' + arg.value);
     }
 
     const type = env[statement.shape].ref;
-    console.log('0-------', type);
-
     const zero = llvm.ConstantInt.get(this.context, 0, 64);
     const alloca = this.builder.createAlloca(type, zero, statement.name);
 

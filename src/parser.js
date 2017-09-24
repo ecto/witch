@@ -11,7 +11,6 @@ const IDENTIFIER_NEW = 'new';
 
 module.exports = class Parser {
   run(tokens) {
-    console.log(tokens);
     return tokens.map(({type, value, children}) => {
       if (this.isFunctionDefinition(value)) {
         return {
@@ -112,7 +111,12 @@ module.exports = class Parser {
         return;
       }
 
-      console.log('??????????????', type, name, args);
+      if (type === TYPE_CREATOR) {
+        console.log(push, 'CREATE', shape, name);
+        return;
+      }
+
+      console.log(push, '??????????????', type, name, args);
     });
   }
 };
