@@ -1,3 +1,8 @@
 docs/_site
 witch
 node_modules
+
+# remove when moved to /tmp
+out
+out.s
+out.bc
