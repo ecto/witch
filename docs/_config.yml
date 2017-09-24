@@ -1,4 +1,4 @@
 name: Dryad
 markdown: redcarpet
-highlighter: pygments
+highlighter: rogue
 baseurl: /
