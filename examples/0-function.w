@@ -1,9 +1,9 @@
-fn print-hello name
+fn printHello name
   puts '3:'
   puts 'hello,'
   puts name
 
 fn main
   puts '1: hello, world'
-  print-hello 'world'
-  puts print-hello
+  printHello 'world'
+  puts printHello

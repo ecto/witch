@@ -1,7 +1,11 @@
 {
+  "name": "witchlang",
+  "license": "MIT",
   "dependencies": {
     "llvm-node": "^2.0.4",
-    "pegjs": "^0.10.0",
-    "petard": "^0.0.7-b"
+    "pegjs": "^0.10.0"
+  },
+  "bin": {
+    "witch": "./bin/witch"
   }
 }
