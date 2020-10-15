@@ -1,11 +1,16 @@
 {
   "name": "witchlang",
   "license": "MIT",
+  "version": "0.0.1",
   "dependencies": {
-    "llvm-node": "^2.0.4",
-    "pegjs": "^0.10.0"
+    "@types/node": "^14.10.1",
+    "commander": "^6.1.0",
+    "llvm-node": "github:mbrowne/llvm-node#llvm-node-v2.1.1-gitpkg",
+    "ts-node": "^9.0.0",
+    "typescript": "^4.0.2"
   },
   "bin": {
     "witch": "./bin/witch"
-  }
+  },
+  "devDependencies": {}
 }

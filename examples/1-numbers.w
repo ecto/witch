@@ -1,2 +1,1 @@
-fn main
-  puts 42
+[fn main [puts 42]]
